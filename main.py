@@ -57,7 +57,7 @@ def main():
     
     # Generate initial population
     population = []
-    for _ in range(POPULATION_SIZE):
+    while len(population) < POPULATION_SIZE:
         team = []
         for position, count in FORMATION.items():
             # Check if the position exists in the 'data' dictionary before proceeding
@@ -69,7 +69,10 @@ def main():
             else:
                 print(f"No players can play the position {position}")
                 return
-        population.append(Team(team))
+        team = Team(team)
+        if team.calculate_chemistry() >= MIN_CHEMISTRY:
+            population.append(team)
+
 
 
     # Run genetic algorithm
@@ -77,10 +80,18 @@ def main():
         print(f"Generation {generation}")
 
         # Calculate fitness values
-        fitness_values = [team.fitness(BUDGET) for team in population]
+        fitness_values = [team.fitness(BUDGET, MIN_CHEMISTRY) if team.calculate_chemistry() >= MIN_CHEMISTRY else 100 for team in population]
+
+
+
 
         # Select parents
-        parents = random.choices(population, weights=fitness_values, k=POPULATION_SIZE)
+        parents = []
+        while len(parents) < POPULATION_SIZE:
+            parent = random.choices(population, weights=fitness_values, k=1)[0]
+            if parent.calculate_chemistry() >= MIN_CHEMISTRY:
+                parents.append(parent)
+
 
         # Perform crossover
         population = []
@@ -101,7 +112,10 @@ def main():
                         player.selected_position = position  # Set selected_position
                     selected_players = unique_parents + additional_players
                 new_team_players.extend(selected_players)
-            population.append(Team(new_team_players))
+            new_team = Team(new_team_players)
+            if new_team.calculate_chemistry() >= MIN_CHEMISTRY:
+                population.append(new_team)
+
 
         # Perform mutation
         for team in population:
@@ -114,6 +128,7 @@ def main():
                     new_player.selected_position = old_player.selected_position  # Set selected_position
                     team.players[team.players.index(old_player)] = new_player
 
+
         # Replace over-budget teams
         for i, team in enumerate(population):
             while team.cost() > BUDGET:
@@ -125,15 +140,19 @@ def main():
                 else:
                     break
 
+
+
     # Display best team
-    best_team = max(population, key=lambda team: team.fitness(BUDGET) and team.calculate_chemistry() >= MIN_CHEMISTRY)
+    best_team = max(population, key=lambda team: team.fitness(BUDGET, MIN_CHEMISTRY))
+
 
     print("\nBest Team:")
     for position in FORMATION:
         players_in_position = [player for player in best_team.players if player.selected_position == position]
         for player in players_in_position:
             print(f"{position}: {player.name} (DA Score: {player.performance_scores[player.selected_position]}, Cost: {player.cost})")
-    print(f"Total rating: {round(best_team.fitness(BUDGET), 2)}, Total cost: {round(best_team.cost(), 2)}, Chemistry: {best_team.calculate_chemistry()} out of 33")
+    print(f"Total rating: {round(best_team.fitness(BUDGET, MIN_CHEMISTRY), 2)}, Total cost: {round(best_team.cost(), 2)}, Chemistry: {best_team.calculate_chemistry()} out of 33")
+
 
 if __name__ == '__main__':
     main()
