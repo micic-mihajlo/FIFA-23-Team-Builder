@@ -62,5 +62,8 @@ class Team:
         performance_score = sum(player.performance_scores[player.selected_position] for player in self.players if player.selected_position in player.performance_scores)
         total_chemistry = self.calculate_chemistry()
         team_cost = self.cost()
-        budget_utilization = abs(budget - team_cost)
-        return performance_score + total_chemistry * 500 - budget_utilization / 5000
+        if budget is not None:
+            budget_utilization = abs(budget - team_cost)
+        else:
+            budget_utilization = 0  # Ignore budget if None
+        return performance_score * 50 + total_chemistry * 10 - budget_utilization / 750
