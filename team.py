@@ -66,4 +66,4 @@ class Team:
             budget_utilization = abs(budget - team_cost)
         else:
             budget_utilization = 0  # Ignore budget if None
-        return performance_score * 50 + total_chemistry * 10 - budget_utilization / 750
+        return performance_score * 50 + total_chemistry * 30 - budget_utilization / 750

@@ -90,37 +90,30 @@ def main():
     # Generate initial population
     population = []
     while len(population) < POPULATION_SIZE:
-        team = []
+        players_list = []
         already_chosen_player_names = []
         for position, count in FORMATION.items():
-            # Check if the position exists in the 'data' dictionary before proceeding
             if position in data:
-                possible_players = [player for player in data[position] 
+                available_players = [player for player in data[position] 
                                     if player.performance_scores[position] > min_score 
                                     and player.name not in already_chosen_player_names]
-                if len(possible_players) >= count:
-                    chosen_players = random.sample(possible_players, k=count)
-                    for player in chosen_players:
-                        player.selected_position = position  # Set selected_position
-                        already_chosen_player_names.append(player.name)
-                    team.extend(chosen_players)
-                else:
-                    break
+                chosen_players = random.sample(available_players, k=count)
+                for player in chosen_players:
+                    player.selected_position = position  # Set selected_position
+                    already_chosen_player_names.append(player.name)  # Immediately update chosen players
+                players_list.extend(chosen_players)
             else:
                 print(f"No players can play the position {position}")
                 return
-        team = Team(team)
+        team = Team(players_list)
         if team.calculate_chemistry() >= MIN_CHEMISTRY:
             population.append(team)
 
 
 
 
-
-
-
     # Run genetic algorithm
-    for generation in range(5000):  # Run for 20000 generations
+    for generation in range(12500):  # Run for 20000 generations
         if generation % 100 == 0: print(f"Generation {generation}")
 
         # Calculate fitness values
@@ -139,26 +132,27 @@ def main():
         population = []
         for parent1, parent2 in zip(parents[::2], parents[1::2]):
             new_team_players = []
-            already_chosen_player_names = []
+            already_chosen_player_names = []  # this will hold names of players already added to the team
             for position, count in FORMATION.items():
                 parent_choice = random.choice([parent1, parent2])
                 parent_players = [player for player in parent_choice.players 
-                                if player.selected_position == position 
-                                and player.performance_scores[position] > min_score
-                                and player.name not in already_chosen_player_names]
+                    if player.selected_position == position 
+                    and player.performance_scores[position] > min_score
+                    and player.name not in already_chosen_player_names]  # filter out already chosen players
+
                 if len(parent_players) >= count:
                     selected_players = random.sample(parent_players, count)
                     for player in selected_players:
-                        already_chosen_player_names.append(player.name)
+                        already_chosen_player_names.append(player.name)  # add the chosen player's name to the list of already chosen players
                     new_team_players.extend(selected_players)
                 else:
                     remaining_needed = count - len(parent_players)
                     additional_players = random.sample([p for p in data[position] 
-                                                        if p.name not in already_chosen_player_names
-                                                        and p.performance_scores[position] > min_score], 
-                                                    remaining_needed)
+                                                    if p.name not in already_chosen_player_names  # also here, filter out already chosen players
+                                                    and p.performance_scores[position] > min_score], 
+                                                remaining_needed)
                     for player in additional_players:
-                        already_chosen_player_names.append(player.name)
+                        already_chosen_player_names.append(player.name)  # add the chosen player's name to the list of already chosen players
                     new_team_players.extend(additional_players)
             new_team = Team(new_team_players)
             if new_team.calculate_chemistry() >= MIN_CHEMISTRY:
@@ -168,18 +162,33 @@ def main():
 
 
 
+
+
         # Perform mutation
-        for team in population:
+        for i, team in enumerate(population):
             if random.random() < 0.1:
                 old_player = random.choice(team.players)
+                if old_player.selected_position is None or old_player.selected_position not in data:
+                    continue
+                team_player_names = set(player.name for player in team.players)  # Convert list to set for faster membership checks
                 possible_replacements = [player for player in data[old_player.selected_position] if player != old_player]
-                if not greatest_squad:  # If it's not greatest squad, then consider budget
+                if not greatest_squad:  # If it's not the greatest squad, then consider the budget
                     possible_replacements = [player for player in possible_replacements if player.cost <= old_player.cost]
-                unique_replacements = [p for p in possible_replacements if p.name not in [player.name for player in team.players]]
+                unique_replacements = []  # Initialize unique_replacements to an empty list
+                if possible_replacements:
+                    unique_replacements = [p for p in possible_replacements if p.name not in team_player_names]
                 if unique_replacements:
                     new_player = random.choice(unique_replacements)
                     new_player.selected_position = old_player.selected_position  # Set selected_position
                     team.players[team.players.index(old_player)] = new_player
+                    population[i] = Team(team.players)  # Convert the updated player list back to a Team object
+
+
+
+
+
+
+
 
 
         # Replace over-budget teams
@@ -193,6 +202,9 @@ def main():
                         team.players[team.players.index(old_player)] = new_player
                     else:
                         break
+        
+        # Remove teams with duplicate players
+        population = [team for team in population if len(set(player.name for player in team.players)) == len(team.players)]
 
 
 

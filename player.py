@@ -32,3 +32,8 @@ class Player:
         self.league = row['League']
         self.rank = row['rank']
         self.selected_position = None
+    
+    def __eq__(self, other):
+        if isinstance(other, Player):
+            return self.name == other.name  # Assuming name is a unique identifier
+        return False
