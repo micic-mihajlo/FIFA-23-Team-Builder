@@ -10,9 +10,9 @@ class Player:
         self.alt_positions = [row['AltPos1'], row['AltPos2'], row['AltPos3']]  # list of alternative positions
         self.alt_positions = [pos for pos in self.alt_positions if pd.notna(pos)]  # remove NaN values
         self.performance_scores = {
-            'LB': row['percfb'],
+            'LB': row['percfb'], 
             'RB': row['percfb'],
-            'CB': row['perccb'],
+            'CB': row['perccb'], 
             'LM': row['percwng'],
             'LW': row['percwng'],
             'RM': row['percwng'],
@@ -31,6 +31,8 @@ class Player:
         self.nationality = row['Nationality']
         self.league = row['League']
         self.rank = row['rank']
+        self.DAId = row['DAId']
+        self.ID = row['ID']
         self.selected_position = None
     
     def __eq__(self, other):

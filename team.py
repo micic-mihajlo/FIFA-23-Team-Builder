@@ -56,14 +56,12 @@ class Team:
 
         return total_chemistry
 
-    def fitness(self, budget, min_chemistry):
-        if self.calculate_chemistry() < min_chemistry:
-            return 0
-        performance_score = sum(player.performance_scores[player.selected_position] for player in self.players if player.selected_position in player.performance_scores)
+    def fitness(self, budget, min_chemistry, specific_players_cost=0):
         total_chemistry = self.calculate_chemistry()
-        team_cost = self.cost()
-        if budget is not None:
-            budget_utilization = abs(budget - team_cost)
-        else:
-            budget_utilization = 0  # Ignore budget if None
-        return performance_score * 50 + total_chemistry * 30 - budget_utilization / 750
+        if total_chemistry < min_chemistry:
+            return 0
+        performance_score = sum(player.performance_scores.get(player.selected_position, 0) for player in self.players)
+        team_cost = self.cost() - specific_players_cost
+        budget_utilization = abs(budget - team_cost) if budget is not None else 0  # Ignore budget if None
+        return performance_score * 30 + total_chemistry * 225 - budget_utilization / 10000
+
