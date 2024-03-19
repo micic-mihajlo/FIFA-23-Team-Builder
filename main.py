@@ -8,9 +8,9 @@ import collections
 def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description='Build the best FIFA 23 team within a given budget or the greatest squad.')
-    parser.add_argument('budget', type=int, nargs='?', default=None, help='The total cost of the team should not exceed this value.')
+    parser.add_argument('budget', type=int, nargs='?', default=5000000, help='The total cost of the team should not exceed this value.')
     parser.add_argument('--formation', type=str, default='4-4-2', help='The formation of the team. Default is "4-4-2".')
-    parser.add_argument('--min_chemistry', type=int, default=0, help='The minimum chemistry for the team.')
+    parser.add_argument('--min_chemistry', type=int, default=27, help='The minimum chemistry for the team.')
     parser.add_argument('--greatest_squad', action='store_true', help='If provided, disregards the budget and just creates the greatest squad with players having performance score higher than 98 and chemistry higher than 30.')
     parser.add_argument('--legend_squad', action='store_true', help='Generate a squad with only players with performance scores greater than 97 in their positions.')
     parser.add_argument('--specific_players', nargs='+', type=str, help='DAIds of specific players that must be included in the team. Should be passed as DAId:position pairs (e.g. 415:CM 237:ST).')
@@ -259,7 +259,7 @@ def main():
         for player in players_in_position:
             print(f"{position}: {player.name} (DA Score: {player.performance_scores[player.selected_position]}, Cost: {player.cost})")
     print(f"Total rating: {round(best_team.fitness(None if greatest_squad else BUDGET, MIN_CHEMISTRY), 2)}, Total cost: {round(best_team.cost(), 2)}, Chemistry: {best_team.calculate_chemistry()} out of 33")
-
+    
 
 
 
