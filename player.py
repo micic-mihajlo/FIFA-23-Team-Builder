@@ -7,8 +7,8 @@ class Player:
             return
         self.name = row['Name']
         self.main_position = row['Position']
-        self.alt_positions = [row['AltPos1'], row['AltPos2'], row['AltPos3']]  # list of alternative positions
-        self.alt_positions = [pos for pos in self.alt_positions if pd.notna(pos)]  # remove NaN values
+        self.alt_positions = [row['AltPos1'], row['AltPos2'], row['AltPos3']]  
+        self.alt_positions = [pos for pos in self.alt_positions if pd.notna(pos)]  
         self.performance_scores = {
             'LB': row['percfb'], 
             'RB': row['percfb'],
@@ -37,5 +37,5 @@ class Player:
     
     def __eq__(self, other):
         if isinstance(other, Player):
-            return self.name == other.name  # Assuming name is a unique identifier
+            return self.name == other.name  
         return False
