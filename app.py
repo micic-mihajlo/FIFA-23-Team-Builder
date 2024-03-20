@@ -27,8 +27,8 @@ formations = {
 budget = st.slider("Budget", min_value=1000000, max_value=10000000, value=5000000, step=100000)
 formation = st.selectbox("Formation", list(formations.keys()), index=list(formations.keys()).index('4-4-2'))
 min_chemistry = st.slider("Minimum Chemistry", min_value=0, max_value=33, value=27)
-greatest_squad = st.checkbox("Generate Greatest Squad", help="If checked, disregards the budget and creates the greatest squad with players having a performance score higher than 98 and chemistry higher than 30.")
-legend_squad = st.checkbox("Generate Legend Squad", help="If checked, generates a squad with only players having performance scores greater than 97 in their positions.")
+greatest_squad = st.checkbox("Generate Greatest Squad", help="Generates the squad with the highest total rating and no matter the cost.")
+legend_squad = st.checkbox("Generate Legend Squad")
 specific_players = st.text_input("Specific Players (DAId:position pairs, separated by spaces)")
 
 
