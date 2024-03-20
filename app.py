@@ -104,8 +104,8 @@ progress_bar_placeholder = st.empty()
 if st.button("Generate Squad"):
     loading_message_placeholder.text("Generating the ultimate squad... ⚽🌟")
     progress_bar = progress_bar_placeholder.progress(0)
-    for generation in range(3000):
-        progress_bar.progress((generation + 1) / 3000)
+    for generation in range(1500):
+        progress_bar.progress((generation + 1) / 1500)
 
         if generation % 100 == 0: print(f"Generation {generation}")
 
