@@ -6,13 +6,12 @@ class Team:
         self.club_counts = Counter(player.club for player in self.players)
         self.nationality_counts = Counter(player.nationality for player in self.players)
         self.league_counts = Counter(player.league for player in self.players)
-        self.chemistry = None  # This will be used to store the chemistry once calculated
+        self.chemistry = None  
 
     def cost(self):
         return sum(player.cost for player in self.players)
 
     def calculate_chemistry(self):
-        # If chemistry was already calculated, return it
         if self.chemistry is not None:
             return self.chemistry
 
@@ -51,7 +50,6 @@ class Team:
 
             total_chemistry += chem
 
-        # Store the calculated chemistry for future use
         self.chemistry = total_chemistry
 
         return total_chemistry
@@ -62,6 +60,6 @@ class Team:
             return 0
         performance_score = sum(player.performance_scores.get(player.selected_position, 0) for player in self.players)
         team_cost = self.cost() - specific_players_cost
-        budget_utilization = abs(budget - team_cost) if budget is not None else 0  # Ignore budget if None
+        budget_utilization = abs(budget - team_cost) if budget is not None else 0 
         return performance_score * 30 + total_chemistry * 225 - budget_utilization / 10000
 
